@@ -1,0 +1,41 @@
+Sub Estoque()
+
+
+        Set objMyConn = New ADODB.Connection
+        Set objMyRecordset = New ADODB.Recordset
+        Dim strSQL As String
+
+
+        objMyConn.ConnectionString = "Provider=***;Server=***;Database=***;User Id=***;Password=***" 'Dados pertencentes ao Grupo Empresarial
+        objMyConn.CommandTimeout = 280
+        objMyConn.Open
+
+
+        
+                strSQL = "SELECT SZA010.ZA_PECA, SZA010.ZA_PROD,SB1010.B1_DESC, SZA010.ZA_LOCALIZ, SZA010.ZA_ALMOX, SZA010.ZA_COMPRI, CAST(SZA010.ZA_DATA AS SMALLDATETIME)"
+        strSQL = strSQL & " FROM SZA010 (NOLOCK) INNER JOIN SB1010 (NOLOCK) ON (SZA010.ZA_PROD = SB1010.B1_COD)"
+        strSQL = strSQL & " WHERE SZA010.ZA_STATUS IN ('R')  AND SZA010.ZA_FILIAL = '04' AND SZA010.D_E_L_E_T_ = '' AND SUBSTRING(SZA010.ZA_PROD,1,1) IN ('1','6','5','7','D','E') "
+        strSQL = strSQL & " GROUP BY SZA010.ZA_PECA, SZA010.ZA_PROD,SB1010.B1_DESC, SZA010.ZA_LOCALIZ, SZA010.ZA_ALMOX, SZA010.ZA_COMPRI,SZA010.ZA_DATA"
+        strSQL = strSQL & " ORDER BY SZA010.ZA_PECA"
+        
+
+        
+        Set objMyRecordset.ActiveConnection = objMyConn
+        objMyRecordset.Open strSQL
+
+
+        
+        Plan1.Range("A2:G200006").Clear
+
+        Plan1.Range("A2").CopyFromRecordset (objMyRecordset)
+        
+        Range("A1") = "Peça"
+        Range("B1") = "Produto"
+        Range("C1") = "Descrição"
+        Range("D1") = "Localização"
+        Range("E1") = "Estoque"
+        Range("F1") = "Metragem"
+        Range("G1") = "Data"
+        Range("M1") = "Atualizado"
+        Range("M2") = Now
+End Sub
